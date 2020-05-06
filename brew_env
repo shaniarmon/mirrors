@@ -1,0 +1,15 @@
+#! /usr/bin/env bash
+
+# Library/Homebrew/env_config.rb
+
+# Possibly relevant variables 
+#export HOMEBREW_ARTIFACT_DOMAIN=
+
+export HOMEBREW_FORCE_HOMEBREW_ON_LINUX=1
+#export HOMEBREW_BOTTLE_DOMAIN=https://homebrew.bintray.com/
+
+#export HOMEBREW_BREW_GIT_REMOTE
+
+#export HOMEBREW_CORE_GIT_REMOTE
+#export HOMEBREW_GIT_EMAIL=$(git config --get user.email)
+#export HOMEBREW_GIT_NAME=$(git config --get user.name)
