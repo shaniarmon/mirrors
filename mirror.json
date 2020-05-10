@@ -1,0 +1,21 @@
+{
+    "brew": {"taps": []},
+    "git": [
+        {
+            "dest": "homebrew/brew",
+            "url": "https://github.com/Homebrew/brew.git"
+        },
+        {
+            "dest": "homebrew/homebrew-core",
+            "url": "https://github.com/Homebrew/homebrew-core.git"
+        },
+        {
+            "dest": "homebrew/homebrew-cask",
+            "url": "https://github.com/Homebrew/homebrew-cask.git"
+        },
+        {
+            "dest": "homebrew/homebrew-services",
+            "url": "https://github.com/Homebrew/homebrew-services.git"
+        }
+    ]
+}
