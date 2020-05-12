@@ -158,7 +158,7 @@ def calculate_current_tap_state(tap):
 def load_previous_revision_info(folder):
     filename = os.path.join(folder, "HEAD")
     if not os.path.exists(filename):
-        return {"formulae": {"no_bottle": [], "bottles": []}, "revision": "CLEAN"}
+        return {"formulae": {"no_bottle": [], "bottles": []}, "revision": "CLEAN", "previous_revision": None}
     with open(os.path.join(folder, "HEAD")) as f:
         return json.load(f)
 
@@ -171,6 +171,8 @@ def calculate_backtracking_delta(current, previous):
     removed_bottles = previous_bottles - current_bottles
 
     return {
+        "previous_revision": previous["previous_revision"],
+        "next_revision": current["revision"],
         "remove": list(new_bottles),
         "add": list(removed_bottles)
     }
@@ -184,7 +186,7 @@ def mirror(tap, output_folder):
     previous_revision = load_previous_revision_info(output_folder)
     if current_revision["revision"] == previous_revision["revision"]:
         raise ValueError("Already up to date")
-    
+
     current_revision["previous_revision"] = previous_revision["revision"]
     delta = calculate_backtracking_delta(current_revision, previous_revision)
 
