@@ -7,6 +7,15 @@ import sys
 from functools import lru_cache
 import logging
 import inspect
+import requests
+
+
+def download_file(url, filename):
+    with open(filename, 'wb') as f:
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
 
 
 SUPPORTED_OPERATING_SYSTEMS = ["catalina", "mojave"]
@@ -182,7 +191,7 @@ def update_mirror_metadata(tap, output_folder):
     current_revision = calculate_current_tap_state(tap)
     previous_revision = load_previous_revision_info(output_folder)
     if current_revision["revision"] == previous_revision["revision"]:
-        raise ValueError("Already up to date")
+        return
 
     current_revision["previous_revision"] = previous_revision["revision"]
     delta = calculate_backtracking_delta(current_revision, previous_revision)
@@ -199,31 +208,34 @@ def update_mirror_metadata(tap, output_folder):
 
 
 def download_mirror_bottles(repository_folder):
-    with open(os.path.join(output_folder, "HEAD"), "r") as f:
-        mirror_info = json.read(f)
+    with open(os.path.join(repository_folder, "HEAD"), "r") as f:
+        mirror_info = json.load(f)
     
-    if not os.path.exists(os.path.join(output_folder, "LAST_DOWNLOADED_REVISION")):
+    if not os.path.exists(os.path.join(repository_folder, "LAST_DOWNLOADED_REVISION")):
         last_downloaded_revision = 'CLEAN'
-    
-    with open(os.path.join(output_folder, "LAST_DOWNLOADED_REVISION")) as f:
-        last_downloaded_revision = f.read()
+    else:
+        with open(os.path.join(repository_folder, "LAST_DOWNLOADED_REVISION")) as f:
+            last_downloaded_revision = f.read()
 
     currently_downloading_revision = mirror_info["revision"]
-    next_delta_file = f"{mirror_info['previous_revision']}.delta"
+    previous_revision = mirror_info['previous_revision']
+    next_delta_file = f"{previous_revision}.delta"
     while currently_downloading_revision != last_downloaded_revision:
-        log.info(f"Currently downloading bottled for revision {currently_downloading_revision}")
-        bottle_folder = os.path.join(output_folder, "bottles", currently_downloading_revision)
-        os.makedirs(bottle_folder)
-        with open(os.path.join(output_folder, next_delta_file) as f:
+        log.info(f"Currently downloading bottles for revision {currently_downloading_revision}")
+        bottle_folder = os.path.join(repository_folder, "bottles", currently_downloading_revision)
+        if not os.path.exists(bottle_folder):
+            os.makedirs(bottle_folder)
+        with open(os.path.join(repository_folder, next_delta_file)) as f:
             delta_contents = json.load(f)
         for bottle in delta_contents["remove"]:
             try:
-                download_url(bottle[2], bottle_folder)
-            except:
+                download_file(bottle[2], os.path.join(bottle_folder, os.path.basename(bottle[2])))
+            except Exception:
                 log.warning(f"Could not download '{bottle[0]}' for {bottle[1]}")
 
-        currently_downloading_revision = delta_contents["previous_revision"]
-        next_delta_file = f"{delta_contents['previous_revision']}.delta"
+        currently_downloading_revision = previous_revision
+        previous_revision = delta_contents['previous_revision']
+        next_delta_file = f"{previous_revision}.delta"
 
 
 def mirror(tap, output_folder):
@@ -233,7 +245,6 @@ def mirror(tap, output_folder):
     update_mirror_metadata(tap, output_folder)
 
     download_mirror_bottles(output_folder)
-
 
 
 def argument_parser():
