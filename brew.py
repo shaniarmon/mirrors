@@ -178,10 +178,7 @@ def calculate_backtracking_delta(current, previous):
     }
 
 
-def mirror(tap, output_folder):
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
+def update_mirror_metadata(tap, output_folder):
     current_revision = calculate_current_tap_state(tap)
     previous_revision = load_previous_revision_info(output_folder)
     if current_revision["revision"] == previous_revision["revision"]:
@@ -199,6 +196,44 @@ def mirror(tap, output_folder):
 
     with open(os.path.join(output_folder, "HEAD"), "w") as f:
         json.dump(current_revision, f)
+
+
+def download_mirror_bottles(repository_folder):
+    with open(os.path.join(output_folder, "HEAD"), "r") as f:
+        mirror_info = json.read(f)
+    
+    if not os.path.exists(os.path.join(output_folder, "LAST_DOWNLOADED_REVISION")):
+        last_downloaded_revision = 'CLEAN'
+    
+    with open(os.path.join(output_folder, "LAST_DOWNLOADED_REVISION")) as f:
+        last_downloaded_revision = f.read()
+
+    currently_downloading_revision = mirror_info["revision"]
+    next_delta_file = f"{mirror_info['previous_revision']}.delta"
+    while currently_downloading_revision != last_downloaded_revision:
+        log.info(f"Currently downloading bottled for revision {currently_downloading_revision}")
+        bottle_folder = os.path.join(output_folder, "bottles", currently_downloading_revision)
+        os.makedirs(bottle_folder)
+        with open(os.path.join(output_folder, next_delta_file) as f:
+            delta_contents = json.load(f)
+        for bottle in delta_contents["remove"]:
+            try:
+                download_url(bottle[2], bottle_folder)
+            except:
+                log.warning(f"Could not download '{bottle[0]}' for {bottle[1]}")
+
+        currently_downloading_revision = delta_contents["previous_revision"]
+        next_delta_file = f"{delta_contents['previous_revision']}.delta"
+
+
+def mirror(tap, output_folder):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    update_mirror_metadata(tap, output_folder)
+
+    download_mirror_bottles(output_folder)
+
 
 
 def argument_parser():
