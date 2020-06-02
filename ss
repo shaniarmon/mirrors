@@ -1,1 +1,0 @@
-/home/nachshon/dev/mirrors/env/bin/generic_subcommand
