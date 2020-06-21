@@ -1,5 +1,5 @@
 {
-    "brew": {"taps": []},
+    "brew": {"taps": [], "casks": ["visual-studio-code"]},
     "git": [
         {
             "dest": "homebrew/brew",
