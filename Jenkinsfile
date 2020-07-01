@@ -1,10 +1,10 @@
 pipeline {
   parameters {
-        string(name: 'PERSON', description: 'Who should I say hello to?')
+        string(name: 'NODE', description: 'Where should I run??')
   }
   agent {
     node {
-      label "${params.PERSON}"
+      label "${params.NODE}"
     }
 
   }
