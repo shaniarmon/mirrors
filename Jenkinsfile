@@ -4,7 +4,7 @@ pipeline {
   }
   agent {
     node {
-      label 'test'
+      label "${params.PERSON}"
     }
 
   }
