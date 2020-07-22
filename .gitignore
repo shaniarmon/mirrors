@@ -1,7 +1,9 @@
 .*
 !.gitignore
 *.pyc
-
+*
 /env/
 
 .vscode/
+
+!mirror

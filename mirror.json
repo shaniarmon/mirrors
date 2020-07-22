@@ -1,5 +1,27 @@
 {
-    "brew": {"taps": [], "casks": ["visual-studio-code"]},
+    "brew": {"taps": [], "casks": [
+        "010-editor",
+        "appcode",
+        "araxis-merge",
+        "beyond-compare",
+        "clion",
+        "db-browser-for-sqlite",
+        "firefox",
+        "google-chrome",
+        "intellij-idea",
+        "macdown",
+        "mattermost",
+        "meld",
+        "microsoft-edge",
+        "microsoft-office",
+        "pycharm",
+        "sourcetree",
+        "sublime-text",
+        "teamviewer",
+        "visual-studio-code",
+        "vmware-fusion",
+        "wireshark"
+    ]},
     "git": [
         {
             "dest": "homebrew/brew",
@@ -16,6 +38,10 @@
         {
             "dest": "homebrew/homebrew-services",
             "url": "https://github.com/Homebrew/homebrew-services.git"
+        },
+        {
+            "dest": "homebrew/install",
+            "url": "https://github.com/Homebrew/install.git"
         }
     ]
 }
