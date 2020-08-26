@@ -3,6 +3,11 @@ from contextlib import nullcontext
 import os
 import werkzeug
 import urllib
+import logging
+
+from .inspect import current_module_name
+
+log = logging.getLogger(current_module_name())
 
 
 def get_download_name_from_request(request):
@@ -21,6 +26,7 @@ def get_download_name(url):
 
 def download_file(url, filename_or_obj):
     filename = None
+    log.info(f"Downloading {url!r}")
     with requests.get(url, stream=True) as request:
         if not isinstance(filename_or_obj, str):
             fileobj = nullcontext(filename_or_obj)
